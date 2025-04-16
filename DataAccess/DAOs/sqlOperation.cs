@@ -23,6 +23,11 @@ namespace DataAccess.DAOs
             Parameters = new List<SqlParameter>();
         }
 
+        public void AddJsonParam(string name, string value)
+        {
+            AddStringParameter(name, value); // Reutilizas el método existente
+        }
+
         public void AddStringParameter(string paramName, string paramValue)
         {
             Parameters.Add(new SqlParameter(paramName, paramValue));
@@ -39,6 +44,10 @@ namespace DataAccess.DAOs
         }
 
         public void AddDateTimeParam(string paramName, DateTime paramValue)
+        {
+            Parameters.Add(new SqlParameter(paramName, paramValue));
+        }
+        public void AddIntParameter(string paramName, int paramValue)
         {
             Parameters.Add(new SqlParameter(paramName, paramValue));
         }
