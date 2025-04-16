@@ -1,0 +1,46 @@
+﻿@page
+@model WebApp.Pages.RegisterModel
+@{
+    ViewData["Title"] = "Registrarse";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center text-orange">Registrarse</h2>
+    <form id="registerForm" class="mt-4">
+        <div class="mb-3">
+            <label for="name" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="name" placeholder="Ingrese su nombre" required>
+        </div>
+        <div class="mb-3">
+            <label for="lastname" class="form-label">Apellido</label>
+            <input type="text" class="form-control" id="lastname" placeholder="Ingrese su apellido" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Correo Electrónico</label>
+            <input type="email" class="form-control" id="email" placeholder="Ingrese su correo" required>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Contraseña</label>
+            <input type="password" class="form-control" id="password" placeholder="Ingrese su contraseña" required>
+        </div>
+        <div class="mb-3">
+            <label for="phoneNumber" class="form-label">Teléfono</label>
+            <input type="text" class="form-control" id="phoneNumber" placeholder="Ingrese su teléfono">
+        </div>
+        <div class="mb-3">
+            <label for="address" class="form-label">Dirección</label>
+            <input type="text" class="form-control" id="address" placeholder="Ingrese su dirección">
+        </div>
+        <div class="mb-3">
+            <label for="birthDate" class="form-label">Fecha de Nacimiento</label>
+            <input type="date" class="form-control" id="birthDate" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Registrarse</button>
+        <p class="mt-3 text-center">¿Ya tienes una cuenta? <a asp-page="/Login">Inicia sesión</a></p>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="~/js/ControlAction.js" defer></script>
+<script src="~/js/Register.js"></script>

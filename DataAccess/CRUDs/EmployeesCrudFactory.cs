@@ -25,6 +25,7 @@ namespace DataAccess.CRUDs
             sqlOperation.AddStringParameter("P_ECARGO", employee.Cargo);
             sqlOperation.AddIntParam("P_ESALARY", employee.Salary);
             sqlOperation.AddStringParameter("P_ESCHEDULE", employee.Schedule);
+            sqlOperation.AddStringParameter("P_EPASSWORD", employee.Password);
 
             _sqlDao.ExecuteProcedure(sqlOperation);
         }
@@ -43,6 +44,7 @@ namespace DataAccess.CRUDs
             sqlOperation.AddStringParameter("P_ECARGO", employee.Cargo);
             sqlOperation.AddIntParam("P_ESALARY", employee.Salary);
             sqlOperation.AddStringParameter("P_ESCHEDULE", employee.Schedule);
+            sqlOperation.AddStringParameter("P_EPASSWORD", employee.Password);
 
             _sqlDao.ExecuteProcedure(sqlOperation);
         }
@@ -74,7 +76,8 @@ namespace DataAccess.CRUDs
                     PhoneNumber = Convert.ToInt32(row["EPHONENUMBER"]),
                     Cargo = row["ECARGO"].ToString(),
                     Salary = Convert.ToInt32(row["ESALARY"]),
-                    Schedule = row["ESCHEDULE"].ToString()
+                    Schedule = row["ESCHEDULE"].ToString(),
+                    Password = row["EPASSWORD"]?.ToString()
                 };
                 employees.Add((T)(object)employee);
             }
@@ -99,7 +102,8 @@ namespace DataAccess.CRUDs
                 PhoneNumber = Convert.ToInt32(row["EPHONENUMBER"]),
                 Cargo = row["ECARGO"].ToString(),
                 Salary = Convert.ToInt32(row["ESALARY"]),
-                Schedule = row["ESCHEDULE"].ToString()
+                Schedule = row["ESCHEDULE"].ToString(),
+                Password = row["EPASSWORD"]?.ToString()
             };
 
             return (T)(object)employee;

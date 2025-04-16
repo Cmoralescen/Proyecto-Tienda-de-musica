@@ -1,16 +1,22 @@
 ﻿$(document).ready(function () {
     var controlActions = new ControlActions();
+    var allCategories = []; // Almacenar todas las categorías para filtrar
 
     loadCategories();
 
-    function loadCategories() {
+    function loadCategories(searchTerm = '') {
         $.ajax({
             url: controlActions.GetUrlApiService('Categories/GetAll'),
             type: 'GET',
             success: function (data) {
-                console.log(data);
+                allCategories = data; // Guardar todas las categorías
+                let filteredCategories = searchTerm
+                    ? data.filter(cat => cat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        cat.description.toLowerCase().includes(searchTerm.toLowerCase()))
+                    : data;
+
                 let rows = '';
-                data.forEach(cat => {
+                filteredCategories.forEach(cat => {
                     rows += `<tr data-id="${cat.id}">
                         <td>${cat.id}</td>
                         <td>${cat.name}</td>
@@ -22,9 +28,18 @@
                     </tr>`;
                 });
                 $('tbody').html(rows);
+            },
+            error: function (err) {
+                console.error("Error al cargar categorías:", err);
+                Swal.fire('Error', 'No se pudieron cargar las categorías.', 'error');
             }
         });
     }
+
+    $('#btnSearch').click(function () {
+        var searchTerm = $('#searchInput').val();
+        loadCategories(searchTerm);
+    });
 
     $('#btnRegister').click(function () {
         Swal.fire({
@@ -32,7 +47,6 @@
             html:
                 '<input id="swal-input1" class="swal2-input" placeholder="Nombre">' +
                 '<input id="swal-input2" class="swal2-input" placeholder="Descripción">',
-
             focusConfirm: false,
             preConfirm: () => {
                 return {
@@ -40,7 +54,6 @@
                     Description: document.getElementById('swal-input2').value
                 };
             }
-
         }).then((result) => {
             if (result.value) {
                 var categoryData = result.value;
@@ -63,7 +76,6 @@
             html:
                 '<input id="swal-input1" class="swal2-input" placeholder="Nombre" value="' + name + '">' +
                 '<input id="swal-input2" class="swal2-input" placeholder="Descripción" value="' + description + '">',
-
             focusConfirm: false,
             preConfirm: () => {
                 return {
@@ -72,7 +84,6 @@
                     Description: document.getElementById('swal-input2').value
                 };
             }
-
         }).then((result) => {
             if (result.value) {
                 var updatedCategory = result.value;
@@ -84,6 +95,10 @@
                     success: function () {
                         Swal.fire('Éxito!', 'Categoría actualizada correctamente', 'success');
                         loadCategories();
+                    },
+                    error: function (err) {
+                        console.error("Error al actualizar categoría:", err);
+                        Swal.fire('Error', 'No se pudo actualizar la categoría.', 'error');
                     }
                 });
             }
@@ -109,6 +124,10 @@
                     success: function () {
                         Swal.fire('Eliminado!', 'La categoría ha sido eliminada', 'success');
                         loadCategories();
+                    },
+                    error: function (err) {
+                        console.error("Error al eliminar categoría:", err);
+                        Swal.fire('Error', 'No se pudo eliminar la categoría.', 'error');
                     }
                 });
             }

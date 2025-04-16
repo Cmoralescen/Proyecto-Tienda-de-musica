@@ -1,6 +1,7 @@
 ﻿$(document).ready(function () {
     var controlActions = new ControlActions();
     var categoriesList = [];
+    var allProducts = []; // Almacenar todos los productos para filtrar
 
     loadProducts();
     loadCategoriesForDropdown();
@@ -14,22 +15,28 @@
             },
             error: function (err) {
                 console.error("Error al cargar categorías:", err);
+                Swal.fire('Error', 'No se pudieron cargar las categorías.', 'error');
             }
         });
     }
 
-    function loadProducts() {
+    function loadProducts(searchTerm = '') {
         $.ajax({
             url: controlActions.GetUrlApiService('Products/GetAll'),
             type: 'GET',
             success: function (data) {
+                allProducts = data;
+                let filteredProducts = searchTerm
+                    ? data.filter(prod => prod.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        prod.description.toLowerCase().includes(searchTerm.toLowerCase()))
+                    : data;
                 let rows = '';
-                data.forEach(prod => {
+                filteredProducts.forEach(prod => {
                     rows += `<tr data-id="${prod.id}">
                         <td>${prod.id}</td>
                         <td>${prod.name}</td>
                         <td>${prod.price}</td>
-                        <td>${prod.category?.name || ''}</td>
+                        <td>${prod.category || ''}</td>
                         <td>${prod.description}</td>
                         <td>
                             <button class="btn btn-warning btn-sm btn-edit"><i class="bi bi-pencil"></i></button>
@@ -41,9 +48,15 @@
             },
             error: function (err) {
                 console.error("Error al cargar productos:", err);
+                Swal.fire('Error', 'No se pudieron cargar los productos.', 'error');
             }
         });
     }
+
+    $('#btnSearch').click(function () {
+        var searchTerm = $('#searchInput').val();
+        loadProducts(searchTerm);
+    });
 
     $('#btnRegister').click(function () {
         let categoryOptions = '';
@@ -67,15 +80,6 @@
 
                 const category = categoriesList.find(cat => cat.id === categoryId)?.name || '';
 
-                console.log("Datos enviados para crear producto:", {
-                    id: 0,
-                    name: name,
-                    description: description,
-                    price: price,
-                    categoryId: categoryId,
-                    category: category
-                });
-
                 return {
                     id: 0,
                     name: name,
@@ -85,20 +89,12 @@
                     category: category
                 };
             }
-
         }).then((result) => {
             if (result.isConfirmed) {
                 var productData = result.value;
-
-                controlActions.PostToAPI('Products/Create', productData, function (response) {
-                    // Verificamos la respuesta
-                    console.log("Respuesta del servidor para el registro de producto:", response);
-                    if (response.success) {
-                        Swal.fire('Éxito!', 'Producto registrado correctamente', 'success');
-                        loadProducts();
-                    } else {
-                        Swal.fire('Error', 'Hubo un problema al registrar el producto.', 'error');
-                    }
+                controlActions.PostToAPI('Products/Create', productData, function () {
+                    Swal.fire('Éxito!', 'Producto registrado correctamente', 'success');
+                    loadProducts();
                 });
             }
         });
@@ -145,7 +141,6 @@
                     category: updatedCategory
                 };
             }
-
         }).then((result) => {
             if (result.isConfirmed) {
                 var updatedProduct = result.value;
@@ -160,6 +155,7 @@
                     },
                     error: function (err) {
                         console.error("Error al actualizar producto:", err);
+                        Swal.fire('Error', 'No se pudo actualizar el producto.', 'error');
                     }
                 });
             }
@@ -188,6 +184,7 @@
                     },
                     error: function (err) {
                         console.error("Error al eliminar producto:", err);
+                        Swal.fire('Error', 'No se pudo eliminar el producto.', 'error');
                     }
                 });
             }

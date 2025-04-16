@@ -21,5 +21,8 @@ namespace DTO
         public int Salary { get; set; }
 
         public string Schedule { get; set; }
+
+        public string Password { get; set; } // Nuevo campo
+
     }
 }

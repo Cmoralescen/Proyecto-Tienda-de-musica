@@ -3,14 +3,23 @@
     var clients = [];
     var employees = [];
     var products = [];
+    var allSales = []; // Almacenar todas las ventas para filtrar
 
-    function loadSales() {
+    loadSales();
+    loadDropdowns();
+
+    function loadSales(searchTerm = '') {
         $.ajax({
             url: controlActions.GetUrlApiService('Sales/GetAll'),
             type: 'GET',
             success: function (data) {
+                allSales = data;
+                let filteredSales = searchTerm
+                    ? data.filter(sale => sale.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        sale.employeeName.toLowerCase().includes(searchTerm.toLowerCase()))
+                    : data;
                 let rows = '';
-                data.forEach(sale => {
+                filteredSales.forEach(sale => {
                     rows += `<tr data-id="${sale.id}">
                                 <td>${sale.id}</td>
                                 <td>${sale.clientName}</td>
@@ -23,9 +32,15 @@
             },
             error: function (err) {
                 console.error("Error al cargar ventas:", err);
+                Swal.fire('Error', 'No se pudieron cargar las ventas.', 'error');
             }
         });
     }
+
+    $('#btnSearch').click(function () {
+        var searchTerm = $('#searchInput').val();
+        loadSales(searchTerm);
+    });
 
     function loadDropdowns(callback) {
         $.when(
@@ -119,18 +134,12 @@
                         return;
                     }
 
-                    controlActions.PostToAPI('Sales/Create', saleData, function (response) {
-                        if (response.success) {
-                            Swal.fire('Éxito!', 'Venta registrada correctamente', 'success');
-                            loadSales();
-                        } else {
-                            Swal.fire('Error', 'Error al registrar la venta.', 'error');
-                        }
+                    controlActions.PostToAPI('Sales/Create', saleData, function () {
+                        Swal.fire('Éxito!', 'Venta registrada correctamente', 'success');
+                        loadSales();
                     });
                 }
             });
         });
     });
-
-    loadSales();
 });

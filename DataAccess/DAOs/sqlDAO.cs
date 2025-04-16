@@ -27,7 +27,9 @@ namespace DataAccess.DAOs
         //Paso 2: Redefinir el constructor default y convertirlo en privado 
         private SqlDAO()
         {
-            _connectionString = @"Data Source=CAMI\SQLEXPRESS02;Initial Catalog=ProyectoMusica;Integrated Security=True;Trust Server Certificate=True";
+            //_connectionString = @"Data Source=CAMI\SQLEXPRESS02;Initial Catalog=ProyectoMusica;Integrated Security=True;Trust Server Certificate=True";
+            _connectionString = @"Data Source=LAPTOP-UHBA6LQ5\SQLEXPRESS;Initial Catalog=ProyectoMusica;Integrated Security=True;Encrypt=True;Trust Server Certificate=True";
+
         }
 
         //Paso 3: Definir el metodo que expone la unica instancia de sqlDate

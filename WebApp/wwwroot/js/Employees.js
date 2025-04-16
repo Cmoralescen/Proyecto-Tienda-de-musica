@@ -4,31 +4,27 @@
     loadEmployees();
 
     function loadEmployees() {
-        $.ajax({
-            url: controlActions.GetUrlApiService('Employees/GetAll'),
-            type: 'GET',
-            success: function (data) {
-                console.log(data);
-                let rows = '';
-                data.forEach(emp => {
-                    rows += `<tr data-id="${emp.id}"> 
-            <td class="employee-name">${emp.name}</td>
-            <td class="employee-lastname">${emp.lastname}</td> 
-            <td class="employee-email">${emp.email}</td>
-            <td class="employee-phone">${emp.phoneNumber}</td>
-            <td class="employee-cargo">${emp.cargo}</td>
-            <td class="employee-salary">₡${emp.salary}</td>
-            <td class="employee-schedule">${emp.schedule}</td>
-            <td>
-                <button class="btn btn-warning btn-sm btn-edit"><i class="bi bi-pencil"></i></button>
-                <button class="btn btn-danger btn-sm btn-delete"><i class="bi bi-trash"></i></button>
-            </td>
-        </tr>`;
-                });
-                $('tbody').html(rows);
-            }
-
-
+        controlActions.GetToApi('Employees/GetAll', function (data) {
+            console.log(data);
+            let rows = '';
+            data.forEach(emp => {
+                rows += `<tr data-id="${emp.id}"> 
+                    <td class="employee-name">${emp.name}</td>
+                    <td class="employee-lastname">${emp.lastname}</td> 
+                    <td class="employee-email">${emp.email}</td>
+                    <td class="employee-phone">${emp.phoneNumber}</td>
+                    <td class="employee-cargo">${emp.cargo}</td>
+                    <td class="employee-salary">₡${emp.salary}</td>
+                    <td class="employee-schedule">${emp.schedule}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm btn-edit"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-danger btn-sm btn-delete"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>`;
+            });
+            $('tbody').html(rows);
+        }, function (error) {
+            Swal.fire('Error', 'No se pudieron cargar los empleados.', 'error');
         });
     }
 
@@ -36,27 +32,37 @@
         Swal.fire({
             title: 'Registrar Empleado',
             html:
-                '<input id="swal-input1" class="swal2-input" placeholder="Nombre">' +
-                '<input id="swal-input2" class="swal2-input" placeholder="Apellido">' + 
-                '<input id="swal-input3" class="swal2-input" placeholder="Email">' +
-                '<input id="swal-input4" class="swal2-input" placeholder="Teléfono">' +
-                '<input id="swal-input5" class="swal2-input" placeholder="Cargo">' +
-                '<input id="swal-input6" class="swal2-input" placeholder="Salario">' +
-                '<input id="swal-input7" class="swal2-input" placeholder="Horario">',
-
+                '<input id="swal-input1" class="swal2-input" placeholder="Nombre" required>' +
+                '<input id="swal-input2" class="swal2-input" placeholder="Apellido" required>' +
+                '<input id="swal-input3" class="swal2-input" placeholder="Email" type="email" required>' +
+                '<input id="swal-input4" class="swal2-input" placeholder="Teléfono" type="number" required>' +
+                '<input id="swal-input5" class="swal2-input" placeholder="Cargo" required>' +
+                '<input id="swal-input6" class="swal2-input" placeholder="Salario" type="number" required>' +
+                '<input id="swal-input7" class="swal2-input" placeholder="Horario" required>' +
+                '<input id="swal-input8" class="swal2-input" placeholder="Contraseña" type="password" required>',
             focusConfirm: false,
             preConfirm: () => {
-                return {
-                    Name: document.getElementById('swal-input1').value,
-                    Lastname: document.getElementById('swal-input2').value,
-                    Email: document.getElementById('swal-input3').value,
+                const employeeData = {
+                    Name: document.getElementById('swal-input1').value.trim(),
+                    Lastname: document.getElementById('swal-input2').value.trim(),
+                    Email: document.getElementById('swal-input3').value.trim(),
                     PhoneNumber: parseInt(document.getElementById('swal-input4').value) || 0,
-                    Cargo: document.getElementById('swal-input5').value,
+                    Cargo: document.getElementById('swal-input5').value.trim(),
                     Salary: parseFloat(document.getElementById('swal-input6').value) || 0,
-                    Schedule: document.getElementById('swal-input7').value
+                    Schedule: document.getElementById('swal-input7').value.trim(),
+                    Password: document.getElementById('swal-input8').value.trim()
                 };
-            }
 
+                // Validar campos
+                if (!employeeData.Name || !employeeData.Lastname || !employeeData.Email ||
+                    employeeData.PhoneNumber <= 0 || !employeeData.Cargo || employeeData.Salary <= 0 ||
+                    !employeeData.Schedule || !employeeData.Password) {
+                    Swal.showValidationMessage('Todos los campos son obligatorios y deben ser válidos.');
+                    return false;
+                }
+
+                return employeeData;
+            }
         }).then((result) => {
             if (result.value) {
                 var employeeData = result.value;
@@ -79,52 +85,95 @@
         var salary = row.find('.employee-salary').text().replace('₡', '');
         var schedule = row.find('.employee-schedule').text();
 
-        
         Swal.fire({
             title: 'Actualizar Empleado',
             html:
-                '<input id="swal-input1" class="swal2-input" placeholder="Nombre" value="' + name + '">' +
-                '<input id="swal-input2" class="swal2-input" placeholder="Apellido" value="' + lastname + '">' +
-                '<input id="swal-input3" class="swal2-input" placeholder="Email" value="' + email + '">' +
-                '<input id="swal-input4" class="swal2-input" placeholder="Teléfono" value="' + phone + '">' +
-                '<input id="swal-input5" class="swal2-input" placeholder="Cargo" value="' + cargo + '">' +
-                '<input id="swal-input6" class="swal2-input" placeholder="Salario" value="' + salary + '">' +
-                '<input id="swal-input7" class="swal2-input" placeholder="Horario" value="' + schedule + '">',
-
+                '<input id="swal-input1" class="swal2-input" placeholder="Nombre" value="' + name + '" required>' +
+                '<input id="swal-input2" class="swal2-input" placeholder="Apellido" value="' + lastname + '" required>' +
+                '<input id="swal-input3" class="swal2-input" placeholder="Email" type="email" value="' + email + '" required>' +
+                '<input id="swal-input4" class="swal2-input" placeholder="Teléfono" type="number" value="' + phone + '" required>' +
+                '<input id="swal-input5" class="swal2-input" placeholder="Cargo" value="' + cargo + '" required>' +
+                '<input id="swal-input6" class="swal2-input" placeholder="Salario" type="number" value="' + salary + '" required>' +
+                '<input id="swal-input7" class="swal2-input" placeholder="Horario" value="' + schedule + '" required>' +
+                '<input id="swal-input8" class="swal2-input" placeholder="Contraseña" type="password" required>',
             focusConfirm: false,
             preConfirm: () => {
-                return {
-                    Id: id,  
-                    Name: document.getElementById('swal-input1').value,
-                    Lastname: document.getElementById('swal-input2').value,
-                    Email: document.getElementById('swal-input3').value,
+                const updatedEmployee = {
+                    Id: id,
+                    Name: document.getElementById('swal-input1').value.trim(),
+                    Lastname: document.getElementById('swal-input2').value.trim(),
+                    Email: document.getElementById('swal-input3').value.trim(),
                     PhoneNumber: parseInt(document.getElementById('swal-input4').value) || 0,
-                    Cargo: document.getElementById('swal-input5').value,
+                    Cargo: document.getElementById('swal-input5').value.trim(),
                     Salary: parseFloat(document.getElementById('swal-input6').value) || 0,
-                    Schedule: document.getElementById('swal-input7').value
+                    Schedule: document.getElementById('swal-input7').value.trim(),
+                    Password: document.getElementById('swal-input8').value.trim()
                 };
-            }
 
+                // Validar campos
+                if (!updatedEmployee.Name || !updatedEmployee.Lastname || !updatedEmployee.Email ||
+                    updatedEmployee.PhoneNumber <= 0 || !updatedEmployee.Cargo || updatedEmployee.Salary <= 0 ||
+                    !updatedEmployee.Schedule || !updatedEmployee.Password) {
+                    Swal.showValidationMessage('Todos los campos son obligatorios y deben ser válidos.');
+                    return false;
+                }
+
+                return updatedEmployee;
+            }
         }).then((result) => {
             if (result.value) {
                 var updatedEmployee = result.value;
-                $.ajax({
-                    url: controlActions.GetUrlApiService('Employees/Update'),
-                    type: 'PUT',
-                    contentType: 'application/json',
-                    data: JSON.stringify(updatedEmployee),
-                    success: function () {
-                        Swal.fire('Éxito!', 'Empleado actualizado correctamente', 'success');
-                        loadEmployees();  
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Error al actualizar el empleado: ", status, error);
-                    }
+                controlActions.PutToAPI('Employees/Update', updatedEmployee, function () {
+                    Swal.fire('Éxito!', 'Empleado actualizado correctamente', 'success');
+                    loadEmployees();
+                }, function (error) {
+                    Swal.fire('Error', error.Message || 'No se pudo actualizar el empleado.', 'error');
                 });
             }
         });
     });
 
+    $('#btnSearch').click(function () {
+        var searchValue = $('#searchInput').val().trim().toLowerCase();
+        controlActions.GetToApi('Employees/GetAll', function (data) {
+            $('tbody').empty();
+            if (data && Array.isArray(data)) {
+                // Filtrar empleados localmente
+                var filteredData = data.filter(emp =>
+                    emp.name.toLowerCase().includes(searchValue) ||
+                    emp.lastname.toLowerCase().includes(searchValue) ||
+                    emp.email.toLowerCase().includes(searchValue) ||
+                    emp.cargo.toLowerCase().includes(searchValue)
+                );
+
+                if (filteredData.length > 0) {
+                    let rows = '';
+                    filteredData.forEach(emp => {
+                        rows += `<tr data-id="${emp.id}"> 
+                            <td class="employee-name">${emp.name}</td>
+                            <td class="employee-lastname">${emp.lastname}</td> 
+                            <td class="employee-email">${emp.email}</td>
+                            <td class="employee-phone">${emp.phoneNumber}</td>
+                            <td class="employee-cargo">${emp.cargo}</td>
+                            <td class="employee-salary">₡${emp.salary}</td>
+                            <td class="employee-schedule">${emp.schedule}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm btn-edit"><i class="bi bi-pencil"></i></button>
+                                <button class="btn btn-danger btn-sm btn-delete"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>`;
+                    });
+                    $('tbody').html(rows);
+                } else {
+                    Swal.fire('Información', 'No se encontraron empleados.', 'info');
+                }
+            } else {
+                Swal.fire('Información', 'No hay empleados registrados.', 'info');
+            }
+        }, function (error) {
+            Swal.fire('Error', 'No se pudo realizar la búsqueda.', 'error');
+        });
+    });
 
     $(document).on('click', '.btn-delete', function () {
         var row = $(this).closest('tr');
@@ -139,13 +188,11 @@
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                $.ajax({
-                    url: controlActions.GetUrlApiService('Employees/Delete/') + id,
-                    type: 'DELETE',
-                    success: function () {
-                        Swal.fire('Eliminado!', 'El empleado ha sido eliminado.', 'success');
-                        loadEmployees();
-                    }
+                controlActions.DeleteToAPI('Employees/Delete?id=' + id, function () {
+                    Swal.fire('Eliminado!', 'El empleado ha sido eliminado.', 'success');
+                    loadEmployees();
+                }, function (error) {
+                    Swal.fire('Error', error.Message || 'No se pudo eliminar el empleado.', 'error');
                 });
             }
         });

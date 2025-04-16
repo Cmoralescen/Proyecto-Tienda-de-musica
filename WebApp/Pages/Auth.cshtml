@@ -1,0 +1,76 @@
+﻿@page
+@model WebApp.Pages.AuthModel
+@{
+    ViewData["Title"] = "Autenticación";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center text-orange">Bienvenido</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <ul class="nav nav-tabs mb-4" id="authTabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="login-tab" data-bs-toggle="tab" href="#login" role="tab" aria-controls="login" aria-selected="true">Iniciar Sesión</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="register-tab" data-bs-toggle="tab" href="#register" role="tab" aria-controls="register" aria-selected="false">Registrarse</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="authTabContent">
+                <!-- Formulario de Inicio de Sesión -->
+                <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="loginEmail" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="loginEmail" placeholder="Ingrese su correo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="loginPassword" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="loginPassword" placeholder="Ingrese su contraseña" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Iniciar Sesión</button>
+                    </form>
+                </div>
+                <!-- Formulario de Registro -->
+                <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
+                    <form id="registerForm">
+                        <div class="mb-3">
+                            <label for="registerName" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="registerName" placeholder="Ingrese su nombre" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerLastname" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" id="registerLastname" placeholder="Ingrese su apellido" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerEmail" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="registerEmail" placeholder="Ingrese su correo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerPassword" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="registerPassword" placeholder="Ingrese su contraseña" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerPhoneNumber" class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" id="registerPhoneNumber" placeholder="Ingrese su teléfono">
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerAddress" class="form-label">Dirección</label>
+                            <input type="text" class="form-control" id="registerAddress" placeholder="Ingrese su dirección">
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerBirthDate" class="form-label">Fecha de Nacimiento</label>
+                            <input type="date" class="form-control" id="registerBirthDate" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Registrarse</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="~/js/ControlAction.js" defer></script>
+<script src="~/js/Auth.js"></script>
