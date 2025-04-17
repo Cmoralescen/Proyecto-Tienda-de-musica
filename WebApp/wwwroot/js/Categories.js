@@ -57,13 +57,24 @@
         }).then((result) => {
             if (result.value) {
                 var categoryData = result.value;
-                controlActions.PostToAPI('Categories/Create', categoryData, function () {
-                    Swal.fire('Éxito!', 'Categoría registrada correctamente', 'success');
-                    loadCategories();
+                $.ajax({
+                    url: controlActions.GetUrlApiService('Categories/Create'),
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(categoryData),
+                    success: function () {
+                        Swal.fire('Éxito!', 'Categoría registrada correctamente', 'success');
+                        loadCategories();
+                    },
+                    error: function (err) {
+                        console.error("Error al registrar categoría:", err);
+                        Swal.fire('Error', 'No se pudo registrar la categoría.', 'error');
+                    }
                 });
             }
         });
     });
+
 
     $(document).on('click', '.btn-edit', function () {
         var row = $(this).closest('tr');
@@ -99,6 +110,7 @@
                     error: function (err) {
                         console.error("Error al actualizar categoría:", err);
                         Swal.fire('Error', 'No se pudo actualizar la categoría.', 'error');
+                        loadCategories();
                     }
                 });
             }

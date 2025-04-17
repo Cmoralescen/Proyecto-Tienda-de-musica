@@ -55,12 +55,16 @@
                             <input type="text" class="form-control" id="registerPhoneNumber" placeholder="Ingrese su teléfono">
                         </div>
                         <div class="mb-3">
-                            <label for="registerAddress" class="form-label">Dirección</label>
-                            <input type="text" class="form-control" id="registerAddress" placeholder="Ingrese su dirección">
+                            <label for="registerCargo" class="form-label">Cargo</label>
+                            <input type="text" class="form-control" id="registerCargo" placeholder="Ingrese su cargo" required>
                         </div>
                         <div class="mb-3">
-                            <label for="registerBirthDate" class="form-label">Fecha de Nacimiento</label>
-                            <input type="date" class="form-control" id="registerBirthDate" required>
+                            <label for="registerSalary" class="form-label">Salario</label>
+                            <input type="number" class="form-control" id="registerSalary" placeholder="Ingrese su salario" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerSchedule" class="form-label">Horario</label>
+                            <input type="text" class="form-control" id="registerSchedule" placeholder="Ejemplo: 9:00-17:00" required>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Registrarse</button>
                     </form>

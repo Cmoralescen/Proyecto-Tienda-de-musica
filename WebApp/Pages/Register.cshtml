@@ -5,7 +5,7 @@
 }
 
 <div class="container mt-5">
-    <h2 class="text-center text-orange">Registrarse</h2>
+    <h2 class="text-center text-orange">Registrarse como Empleado</h2>
     <form id="registerForm" class="mt-4">
         <div class="mb-3">
             <label for="name" class="form-label">Nombre</label>
@@ -28,12 +28,16 @@
             <input type="text" class="form-control" id="phoneNumber" placeholder="Ingrese su teléfono">
         </div>
         <div class="mb-3">
-            <label for="address" class="form-label">Dirección</label>
-            <input type="text" class="form-control" id="address" placeholder="Ingrese su dirección">
+            <label for="cargo" class="form-label">Cargo</label>
+            <input type="text" class="form-control" id="cargo" placeholder="Ingrese su cargo" required>
         </div>
         <div class="mb-3">
-            <label for="birthDate" class="form-label">Fecha de Nacimiento</label>
-            <input type="date" class="form-control" id="birthDate" required>
+            <label for="salary" class="form-label">Salario</label>
+            <input type="number" class="form-control" id="salary" placeholder="Ingrese su salario" step="0.01" required>
+        </div>
+        <div class="mb-3">
+            <label for="schedule" class="form-label">Horario</label>
+            <input type="text" class="form-control" id="schedule" placeholder="Ejemplo: 9:00-17:00" required>
         </div>
         <button type="submit" class="btn btn-primary w-100">Registrarse</button>
         <p class="mt-3 text-center">¿Ya tienes una cuenta? <a asp-page="/Login">Inicia sesión</a></p>

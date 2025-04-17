@@ -7,24 +7,26 @@
         controlActions.GetToApi('Employees/GetAll', function (data) {
             console.log(data);
             let rows = '';
-            data.forEach(emp => {
-                rows += `<tr data-id="${emp.id}"> 
-                    <td class="employee-name">${emp.name}</td>
-                    <td class="employee-lastname">${emp.lastname}</td> 
-                    <td class="employee-email">${emp.email}</td>
-                    <td class="employee-phone">${emp.phoneNumber}</td>
-                    <td class="employee-cargo">${emp.cargo}</td>
-                    <td class="employee-salary">₡${emp.salary}</td>
-                    <td class="employee-schedule">${emp.schedule}</td>
-                    <td>
-                        <button class="btn btn-warning btn-sm btn-edit"><i class="bi bi-pencil"></i></button>
-                        <button class="btn btn-danger btn-sm btn-delete"><i class="bi bi-trash"></i></button>
-                    </td>
-                </tr>`;
-            });
+            if (data && Array.isArray(data)) {
+                data.forEach(emp => {
+                    rows += `<tr data-id="${emp.id}"> 
+                        <td class="employee-name">${emp.name}</td>
+                        <td class="employee-lastname">${emp.lastname}</td> 
+                        <td class="employee-email">${emp.email}</td>
+                        <td class="employee-phone">${emp.phoneNumber}</td>
+                        <td class="employee-cargo">${emp.cargo}</td>
+                        <td class="employee-salary">₡${emp.salary}</td>
+                        <td class="employee-schedule">${emp.schedule}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm btn-edit"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-danger btn-sm btn-delete"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>`;
+                });
+            }
             $('tbody').html(rows);
         }, function (error) {
-            Swal.fire('Error', 'No se pudieron cargar los empleados.', 'error');
+            Swal.fire('Error', error.Message || 'No se pudieron cargar los empleados.', 'error');
         });
     }
 
@@ -61,14 +63,24 @@
                     return false;
                 }
 
+                // Validar formato de email básico
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(employeeData.Email)) {
+                    Swal.showValidationMessage('El correo electrónico no es válido.');
+                    return false;
+                }
+
                 return employeeData;
             }
         }).then((result) => {
-            if (result.value) {
+            if (result.isConfirmed && result.value) {
                 var employeeData = result.value;
                 controlActions.PostToAPI('Employees/Create', employeeData, function () {
                     Swal.fire('Éxito!', 'Empleado registrado correctamente', 'success');
                     loadEmployees();
+                }, function (error) {
+                    var message = error.Message || error.errors?.Password?.[0] || 'No se pudo registrar el empleado.';
+                    Swal.fire('Error', message, 'error');
                 });
             }
         });
@@ -95,7 +107,7 @@
                 '<input id="swal-input5" class="swal2-input" placeholder="Cargo" value="' + cargo + '" required>' +
                 '<input id="swal-input6" class="swal2-input" placeholder="Salario" type="number" value="' + salary + '" required>' +
                 '<input id="swal-input7" class="swal2-input" placeholder="Horario" value="' + schedule + '" required>' +
-                '<input id="swal-input8" class="swal2-input" placeholder="Contraseña" type="password" required>',
+                '<input id="swal-input8" class="swal2-input" placeholder="Nueva contraseña " type="password">',
             focusConfirm: false,
             preConfirm: () => {
                 const updatedEmployee = {
@@ -107,27 +119,35 @@
                     Cargo: document.getElementById('swal-input5').value.trim(),
                     Salary: parseFloat(document.getElementById('swal-input6').value) || 0,
                     Schedule: document.getElementById('swal-input7').value.trim(),
-                    Password: document.getElementById('swal-input8').value.trim()
+                    Password: document.getElementById('swal-input8').value.trim() || null
                 };
 
-                // Validar campos
+                // Validar campos (excluyendo contraseña)
                 if (!updatedEmployee.Name || !updatedEmployee.Lastname || !updatedEmployee.Email ||
                     updatedEmployee.PhoneNumber <= 0 || !updatedEmployee.Cargo || updatedEmployee.Salary <= 0 ||
-                    !updatedEmployee.Schedule || !updatedEmployee.Password) {
+                    !updatedEmployee.Schedule) {
                     Swal.showValidationMessage('Todos los campos son obligatorios y deben ser válidos.');
+                    return false;
+                }
+
+                // Validar formato de email
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(updatedEmployee.Email)) {
+                    Swal.showValidationMessage('El correo electrónico no es válido.');
                     return false;
                 }
 
                 return updatedEmployee;
             }
         }).then((result) => {
-            if (result.value) {
+            if (result.isConfirmed && result.value) {
                 var updatedEmployee = result.value;
                 controlActions.PutToAPI('Employees/Update', updatedEmployee, function () {
                     Swal.fire('Éxito!', 'Empleado actualizado correctamente', 'success');
                     loadEmployees();
                 }, function (error) {
-                    Swal.fire('Error', error.Message || 'No se pudo actualizar el empleado.', 'error');
+                    var message = error.Message || error.errors?.Password?.[0] || 'No se pudo actualizar el empleado.';
+                    Swal.fire('Error', message, 'error');
                 });
             }
         });
@@ -138,12 +158,11 @@
         controlActions.GetToApi('Employees/GetAll', function (data) {
             $('tbody').empty();
             if (data && Array.isArray(data)) {
-                // Filtrar empleados localmente
                 var filteredData = data.filter(emp =>
-                    emp.name.toLowerCase().includes(searchValue) ||
-                    emp.lastname.toLowerCase().includes(searchValue) ||
-                    emp.email.toLowerCase().includes(searchValue) ||
-                    emp.cargo.toLowerCase().includes(searchValue)
+                    (emp.name?.toLowerCase() || '').includes(searchValue) ||
+                    (emp.lastname?.toLowerCase() || '').includes(searchValue) ||
+                    (emp.email?.toLowerCase() || '').includes(searchValue) ||
+                    (emp.cargo?.toLowerCase() || '').includes(searchValue)
                 );
 
                 if (filteredData.length > 0) {
@@ -171,7 +190,7 @@
                 Swal.fire('Información', 'No hay empleados registrados.', 'info');
             }
         }, function (error) {
-            Swal.fire('Error', 'No se pudo realizar la búsqueda.', 'error');
+            Swal.fire('Error', error.Message || 'No se pudo realizar la búsqueda.', 'error');
         });
     });
 
@@ -192,7 +211,8 @@
                     Swal.fire('Eliminado!', 'El empleado ha sido eliminado.', 'success');
                     loadEmployees();
                 }, function (error) {
-                    Swal.fire('Error', error.Message || 'No se pudo eliminar el empleado.', 'error');
+                    var message = error.Message || 'No se pudo eliminar el empleado.';
+                    Swal.fire('Error', message, 'error');
                 });
             }
         });

@@ -77,7 +77,6 @@
                 const price = parseFloat(document.getElementById('swal-input2').value);
                 const description = document.getElementById('swal-input3').value;
                 const categoryId = parseInt(document.getElementById('swal-input4').value);
-
                 const category = categoriesList.find(cat => cat.id === categoryId)?.name || '';
 
                 return {
@@ -92,13 +91,34 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 var productData = result.value;
-                controlActions.PostToAPI('Products/Create', productData, function () {
-                    Swal.fire('Éxito!', 'Producto registrado correctamente', 'success');
-                    loadProducts();
+
+                $.ajax({
+                    url: controlActions.GetUrlApiService('Products/Create'),
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(productData),
+                    success: function () {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Éxito!',
+                            text: 'Producto registrado correctamente'
+                        });
+                        loadProducts();
+                    },
+                    error: function (err) {
+                        console.error("Error al registrar producto:", err);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'No se pudo registrar el producto.'
+                        });
+                        loadProducts();
+                    }
                 });
             }
         });
     });
+
 
     $(document).on('click', '.btn-edit', function () {
         var row = $(this).closest('tr');

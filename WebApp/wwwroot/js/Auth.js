@@ -39,17 +39,34 @@
     $('#registerForm').submit(function (event) {
         event.preventDefault();
 
-        var clientData = {
-            Name: $('#registerName').val(),
-            Lastname: $('#registerLastname').val(),
-            Email: $('#registerEmail').val(),
+        // Capturar los valores del formulario
+        var employeeData = {
+            id: 0, // Incluimos id como 0 para coincidir con el JSON esperado
+            Name: $('#registerName').val().trim(),
+            Lastname: $('#registerLastname').val().trim(),
+            Email: $('#registerEmail').val().trim(),
             Password: $('#registerPassword').val(),
             PhoneNumber: parseInt($('#registerPhoneNumber').val()) || 0,
-            Address: $('#registerAddress').val(),
-            BirthDate: $('#registerBirthDate').val()
+            Cargo: $('#registerCargo').val().trim(),
+            Salary: parseFloat($('#registerSalary').val()) || 0,
+            Schedule: $('#registerSchedule').val().trim()
         };
 
-        controlActions.PostToAPI('Login/Register', clientData, function (response) {
+        // Depuración: Mostrar los datos que se enviarán
+        console.log('Datos enviados al backend:', employeeData);
+
+        // Validar que los campos requeridos no estén vacíos
+        if (!employeeData.Name || !employeeData.Lastname || !employeeData.Email || !employeeData.Password ||
+            !employeeData.Cargo || !employeeData.Schedule || employeeData.Salary <= 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Por favor, complete todos los campos obligatorios y asegúrese de que el salario sea mayor a 0.'
+            });
+            return;
+        }
+
+        controlActions.PostToAPI('Login/Register', employeeData, function (response) {
             Swal.fire({
                 icon: 'success',
                 title: '¡Éxito!',
@@ -63,6 +80,7 @@
                 $('#registerForm')[0].reset();
             });
         }, function (error) {
+            console.error('Error en la solicitud:', error);
             Swal.fire({
                 icon: 'error',
                 title: 'Error',

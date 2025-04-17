@@ -95,25 +95,55 @@
                 '<input id="swal-input3" class="swal2-input" placeholder="Email" value="' + email + '">' +
                 '<input id="swal-input4" class="swal2-input" placeholder="Dirección" value="' + address + '">' +
                 '<input id="swal-input5" class="swal2-input" placeholder="Teléfono" value="' + phone + '">' +
-                '<input id="swal-input6" type="date" class="swal2-input" placeholder="Fecha de nacimiento">',
+                '<input id="swal-input6" type="date" class="swal2-input" placeholder="Fecha de nacimiento">' +
+                '<input id="swal-input7" class="swal2-input" placeholder="Contraseña" value="" type="password">',
             focusConfirm: false,
             preConfirm: () => {
+                var birthDate = document.getElementById('swal-input6').value;
+                // Convertir la fecha a formato ISO si es necesario
+                var formattedBirthDate = birthDate ? new Date(birthDate).toISOString() : null;
+
                 return {
-                    Id: clientId,
-                    Name: document.getElementById('swal-input1').value,
-                    Lastname: document.getElementById('swal-input2').value,
-                    Email: document.getElementById('swal-input3').value,
-                    Address: document.getElementById('swal-input4').value,
-                    PhoneNumber: parseInt(document.getElementById('swal-input5').value) || 0,
-                    BirthDate: document.getElementById('swal-input6').value
+                    id: clientId,
+                    name: document.getElementById('swal-input1').value.trim(),
+                    lastname: document.getElementById('swal-input2').value.trim(),
+                    email: document.getElementById('swal-input3').value.trim(),
+                    address: document.getElementById('swal-input4').value.trim(),
+                    phoneNumber: parseInt(document.getElementById('swal-input5').value) || 0,
+                    birthDate: formattedBirthDate,
+                    password: document.getElementById('swal-input7').value.trim()
                 };
             }
         }).then((result) => {
             if (result.value) {
                 var updatedClient = result.value;
-                $.put(controlActions.GetUrlApiService('Clients/Update'), updatedClient, function () {
-                    Swal.fire('Good job!', 'Cliente actualizado exitosamente', 'success');
-                    loadClients();
+
+                // Validar campos requeridos
+                if (!updatedClient.name || !updatedClient.lastname || !updatedClient.email || !updatedClient.password) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Por favor, complete todos los campos obligatorios (Nombre, Apellido, Email, Contraseña).'
+                    });
+                    return;
+                }
+
+                // Depuración
+                console.log('Datos enviados para actualizar:', updatedClient);
+
+                $.ajax({
+                    url: controlActions.GetUrlApiService('Clients/Update'),
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(updatedClient),
+                    success: function () {
+                        Swal.fire('Good job!', 'Cliente actualizado exitosamente', 'success');
+                        loadClients();
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error al actualizar:', xhr.responseJSON);
+                        Swal.fire('Error', xhr.responseJSON?.Message || 'No se pudo actualizar el cliente.', 'error');
+                    }
                 });
             }
         });

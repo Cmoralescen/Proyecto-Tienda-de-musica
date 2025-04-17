@@ -11,12 +11,12 @@ namespace WebApi.Controllers
     public class LoginController : ControllerBase
     {
         private readonly LoginManager _loginManager;
-        private readonly ClientsManager _clientsManager;
+        private readonly EmployeesManager _employeesManager;
 
         public LoginController()
         {
             _loginManager = new LoginManager();
-            _clientsManager = new ClientsManager();
+            _employeesManager = new EmployeesManager();
         }
 
         [HttpPost]
@@ -48,17 +48,23 @@ namespace WebApi.Controllers
 
         [HttpPost]
         [Route("Register")]
-        public ActionResult Register([FromBody] Clients client)
+        public ActionResult Register([FromBody] Employees employee)
         {
             try
             {
-                if (client == null || string.IsNullOrEmpty(client.Email) || string.IsNullOrEmpty(client.Password) ||
-                    string.IsNullOrEmpty(client.Name) || string.IsNullOrEmpty(client.Lastname))
+                if (employee == null ||
+                    string.IsNullOrEmpty(employee.Email) ||
+                    string.IsNullOrEmpty(employee.Password) ||
+                    string.IsNullOrEmpty(employee.Name) ||
+                    string.IsNullOrEmpty(employee.Lastname) ||
+                    string.IsNullOrEmpty(employee.Cargo) ||
+                    employee.Salary <= 0 ||
+                    string.IsNullOrEmpty(employee.Schedule))
                 {
-                    return BadRequest(new { Message = "Todos los campos obligatorios deben estar completos." });
+                    return BadRequest(new { Message = "Todos los campos obligatorios deben estar completos y el salario debe ser mayor a 0." });
                 }
 
-                _clientsManager.Create(client);
+                _employeesManager.Create(employee);
                 return Ok(new { Message = "Cuenta creada exitosamente." });
             }
             catch (Exception ex)
